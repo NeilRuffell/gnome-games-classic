@@ -1,0 +1,40 @@
+name: Build classic Gnomine Flatpak
+
+on:
+  workflow_dispatch:
+
+jobs:
+  flatpak:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Flatpak Builder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+
+      - name: Install Freedesktop SDK and runtime
+        run: |
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install -y --noninteractive flathub \
+            org.freedesktop.Platform//25.08 \
+            org.freedesktop.Sdk//25.08
+
+      - name: Build original GTK2 Gnomine
+        run: |
+          flatpak-builder --verbose --force-clean --repo=repo build-dir \
+            io.github.NeilRuffell.GnomineClassic.yml
+
+      - name: Export Flatpak bundle
+        run: |
+          flatpak build-bundle --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo \
+            repo gnomine-classic.flatpak io.github.NeilRuffell.GnomineClassic
+
+      - name: Upload installable Flatpak
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnomine-classic-flatpak
+          path: gnomine-classic.flatpak
+          if-no-files-found: error
