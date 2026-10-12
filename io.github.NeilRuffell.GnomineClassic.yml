@@ -25,7 +25,8 @@ modules:
   - name: intltool
     buildsystem: simple
     build-commands:
-      - sed -i 's:\\${:\\$\\{:' intltool-update.in
+      - sed -i 's:\${:\$\{:' intltool-update.in
+      - perl -MXML::Parser -e 'print "XML::Parser available\n"'
       - ./configure --prefix=/app
       - make -j2
       - make install
