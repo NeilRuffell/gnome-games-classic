@@ -29,12 +29,18 @@ jobs:
         run: |
           echo "=== Upstream configure options ==="
           ./configure --help | grep -E 'enable-|disable-|with-' | head -100 || true
+          echo "=== Compiler and Automake definitions in upstream sources ==="
+          grep -nE "AC_PROG_CXX|AM_PROG_CXX|AM_INIT_AUTOMAKE|AC_CONFIG_FILES|AM_CONDITIONAL" configure.ac configure.in 2>/dev/null | head -100 || true
           echo "=== Checking original dependencies ==="
           set +e
           ./configure --prefix=/usr --with-platform=gtk-only --enable-games=gnomine --with-help-method=file > configure-output.log 2>&1
           status=$?
           cat configure-output.log
           if [ "$status" -ne 0 ]; then
+            echo "=== Relevant generated configure references ==="
+            grep -n -E "am__fastdepCXX|ac_compiler_gnu|CXXDEPMODE" configure | tail -35 || true
+            echo "=== Generated Autotools metadata ==="
+            grep -n -E "AC_PROG_CXX|AM_PROG_CXX|AM_INIT_AUTOMAKE" configure.ac configure.in 2>/dev/null || true
             echo "::error::Original configure failed; see missing dependency near end of log."
             exit "$status"
           fi
