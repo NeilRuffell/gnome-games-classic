@@ -24,6 +24,11 @@ modules:
 
   - name: intltool
     buildsystem: autotools
+    build-commands:
+      - sed -i 's:\\${:\\$\\{:' intltool-update.in
+      - ./configure --prefix=/app
+      - make -j2
+      - make install
     cleanup:
       - '*'
     sources:
