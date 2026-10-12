@@ -1,0 +1,35 @@
+id: io.github.NeilRuffell.GnomineClassic
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: gnomine
+
+finish-args:
+  - --socket=x11
+  - --share=ipc
+
+modules:
+  - name: gtk2
+    buildsystem: autotools
+    config-opts:
+      - --disable-gtk-doc
+      - --disable-introspection
+      - --without-libtiff
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.33.tar.xz
+        sha256: ac2ac757f5942d318a311a54b0c80b5ef295f299c2a73c632f6bfb1ff49cc6da
+
+  - name: gnomine-classic
+    buildsystem: simple
+    build-commands:
+      - python3 fix-configure.py
+      - ./configure --prefix=/app --with-platform=gtk-only --with-gtk=2.0 --enable-games=gnomine --with-help-method=file --disable-schemas-install --disable-sound --disable-introspection
+      - make -j2
+      - make install
+      - test -x /app/bin/gnomine
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/gnome-games/2.32/gnome-games-2.32.1.tar.gz
+      - type: file
+        path: patches/fix-configure.py
