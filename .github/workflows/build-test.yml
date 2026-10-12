@@ -31,7 +31,7 @@ jobs:
           ./configure --help | grep -E 'enable-|disable-|with-' | head -100 || true
           echo "=== Checking original dependencies ==="
           set +e
-          ./configure --prefix=/usr --with-platform=gtk-only --enable-games=gnomine > configure-output.log 2>&1
+          ./configure --prefix=/usr --with-platform=gtk-only --enable-games=gnomine --with-help-method=file > configure-output.log 2>&1
           status=$?
           cat configure-output.log
           if [ "$status" -ne 0 ]; then
