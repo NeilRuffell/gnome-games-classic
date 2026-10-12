@@ -1,0 +1,44 @@
+name: Test original GNOME Games build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Install available classic build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config gettext intltool \
+            libgtk2.0-dev libglib2.0-dev libxml2-dev \
+            librsvg2-dev libcanberra-gtk-dev
+
+      - name: Download upstream GNOME Games 2.32.1
+        run: |
+          curl -fL --retry 3 \
+            https://download.gnome.org/sources/gnome-games/2.32/gnome-games-2.32.1.tar.gz \
+            -o games.tar.gz
+          tar -xzf games.tar.gz
+
+      - name: Inspect and configure original source
+        working-directory: gnome-games-2.32.1
+        shell: bash
+        run: |
+          echo "=== Upstream configure options ==="
+          ./configure --help | grep -E 'enable-|disable-|with-' | head -100 || true
+          echo "=== Checking original dependencies ==="
+          set +e
+          ./configure --prefix=/usr > configure-output.log 2>&1
+          status=$?
+          cat configure-output.log
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Original configure failed; see missing dependency near end of log."
+            exit "$status"
+          fi
+
+      - name: Attempt compilation
+        working-directory: gnome-games-2.32.1
+        run: make -j2
