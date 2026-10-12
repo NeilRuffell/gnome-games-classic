@@ -31,5 +31,6 @@ modules:
     sources:
       - type: archive
         url: https://download.gnome.org/sources/gnome-games/2.32/gnome-games-2.32.1.tar.gz
+        sha256: f0cf083f39938d6256d2a27df5bf629ff6067697b905c82f1a728404b00cec7f
       - type: file
         path: patches/fix-configure.py
