@@ -11,6 +11,8 @@ finish-args:
 modules:
   - name: gtk2
     buildsystem: autotools
+    build-options:
+      cflags: -O2 -g -Wno-error=incompatible-pointer-types
     config-opts:
       - --disable-gtk-doc
       - --disable-introspection
