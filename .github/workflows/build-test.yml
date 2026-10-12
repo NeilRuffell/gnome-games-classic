@@ -23,6 +23,20 @@ jobs:
             -o games.tar.gz
           tar -xzf games.tar.gz
 
+      - name: Work around conditional C++ dependency tracking in 2010 configure script
+        working-directory: gnome-games-2.32.1
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("configure")
+          contents = path.read_text()
+          needle = 'if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then'
+          assert contents.count(needle) == 1, "Expected Automake conditional check not found exactly once"
+          # Gnomine is a C application. Supply the unused C++ Automake conditional.
+          contents = contents.replace(needle, "am__fastdepCXX_TRUE='#'\\nam__fastdepCXX_FALSE=\\n" + needle)
+          path.write_text(contents)
+          PY
+
       - name: Inspect and configure original source
         working-directory: gnome-games-2.32.1
         shell: bash
