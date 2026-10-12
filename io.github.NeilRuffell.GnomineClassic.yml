@@ -7,6 +7,7 @@ command: gnomine
 finish-args:
   - --socket=x11
   - --share=ipc
+  - --filesystem=host-os:ro
 
 modules:
   - name: gtk2
@@ -18,6 +19,8 @@ modules:
       - ./configure --prefix=/app --disable-gtk-doc --disable-introspection --without-libtiff
       - make -j2
       - make install
+      - mkdir -p /app/share
+      - ln -sfn /run/host/usr/share/themes /app/share/themes
     sources:
       - type: archive
         url: https://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.33.tar.xz
@@ -39,6 +42,13 @@ modules:
       - type: archive
         url: https://archive.ubuntu.com/ubuntu/pool/main/i/intltool/intltool_0.51.0.orig.tar.gz
         sha256: 67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd
+
+  - name: murrine
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/murrine/0.98/murrine-0.98.2.tar.xz
+        sha256: e9c68ae001b9130d0f9d1b311e8121a94e5c134b82553ba03971088e57d12c89
 
   - name: gnomine-classic
     buildsystem: simple
